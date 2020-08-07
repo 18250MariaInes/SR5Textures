@@ -323,7 +323,7 @@ class Render(object):
                 offset-=2*dx
 
     #Barycentric Coordinates
-    def triangle_bc(self, Ax, Bx, Cx, Ay, By, Cy, Az, Bz, Cz, color = None):
+    def triangle_bc(self, Ax, Bx, Cx, Ay, By, Cy, Az, Bz, Cz, tax, tbx, tcx, tay, tby, tcy, _color = WHITE, texture = None, intensity = 1 ):
         #bounding box
         minX = min(Ax, Bx, Cx)
         minY = min(Ay, By, Cy)
@@ -341,7 +341,26 @@ class Render(object):
                     z = Az * u + Bz * v + Cz * w
                     
                     if z > self.zbuffer[y][x]:
-                        self.glVertex_coord(x, y, color)
+
+                        b, g , r = _color
+                        b /= 255
+                        g /= 255
+                        r /= 255
+
+                        b *= intensity
+                        g *= intensity
+                        r *= intensity
+
+                        if texture:
+                            tx = tax * u + tbx * v + tcx * w
+                            ty = tay * u + tby * v + tcy * w
+
+                            texColor = texture.getColor(tx, ty)
+                            b *= texColor[0] / 255
+                            g *= texColor[1] / 255
+                            r *= texColor[2] / 255
+
+                        self.glVertex_coord(x, y, color(r,g,b))
                         self.zbuffer[y][x] = z
                     
     #funciones para reemplazar numpy del ejemplo de Carlos
@@ -385,7 +404,7 @@ class Render(object):
     def dot(self, normal, lightx, lighty, lightz):
         return (normal[0]*lightx+normal[1]*lighty+normal[2]*lightz)
 
-    def loadModel(self, filename, translate, scale, isWireframe = False): #funcion para crear modelo Obj
+    def loadModel(self, filename, translate, scale, texture=None, isWireframe = False): #funcion para crear modelo Obj
         model = Obj(filename)
         lightx=0
         lighty=0
@@ -421,6 +440,12 @@ class Render(object):
                 y2 = int(v2[1] * scale[1]  + translate[1])
                 z2 = int(v2[2] * scale[2]  + translate[2])
 
+                if vertCount > 3: #asumamos que 4, un cuadrado
+                    v3 = model.vertices[ face[3][0] - 1 ]
+                    x3 = int(v3[0] * scale[0]  + translate[0])
+                    y3 = int(v3[1] * scale[1]  + translate[1])
+                    z3 = int(v3[2] * scale[2]  + translate[2])
+
                 #codigo de pruebas para modulo matematico
                 """print("------------SUBSTRACT----------------------")
                 print(v1)
@@ -444,6 +469,31 @@ class Render(object):
                 #----------FORMULA CON FUNCIONES POR MI---------------
                #normal=productoCruz(V1-V0, v2-V0)/Frobenius
 
+                if texture:
+                    vt0 = model.texcoords[face[0][1] - 1]
+                    vt1 = model.texcoords[face[1][1] - 1]
+                    vt2 = model.texcoords[face[2][1] - 1]
+                    vt0x=vt0[0]
+                    vt0y=vt0[1]
+                    vt1x=vt1[0]
+                    vt1y=vt1[1]
+                    vt2x=vt2[0]
+                    vt2y=vt2[1]
+                    if vertCount > 3:
+                        vt3 = model.texcoords[face[3][1] - 1]
+                        vt3x=vt3[0]
+                        vt3y=vt3[1]
+
+                else:
+                    vt0x=0
+                    vt0y=0
+                    vt1x=0
+                    vt1y=0
+                    vt2x=0
+                    vt2y=0
+                    vt3x=0
+                    vt3y=0
+
 
                 normalMI=self.division(self.cross(self.subtract(x1, x0, y1, y0, z1, z0), self.subtract(x2, x0, y2, y0, z2, z0)),self.frobenius(self.cross(self.subtract(x1, x0, y1, y0, z1, z0), self.subtract(x2, x0, y2, y0, z2, z0))) )
                 #ProductoCruz(normal,light)
@@ -454,16 +504,10 @@ class Render(object):
                 print(self.dot(normalMI, lightx, lighty, lightz))"""
 
                 if intensity >=0:
-                    self.triangle_bc(x0,x1,x2, y0, y1, y2, z0, z1, z2, color(intensity, intensity, intensity))
-                
-                if vertCount > 3: #asumamos que 4, un cuadrado
-                    v3 = model.vertices[ face[3][0] - 1 ]
-                    x3 = int(v3[0] * scale[0]  + translate[0])
-                    y3 = int(v3[1] * scale[1]  + translate[1])
-                    z3 = int(v3[2] * scale[2]  + translate[2])
-
-                    if intensity >=0:
-                        self.triangle_bc(x0,x2,x3, y0, y2,y3, z0, z2,z3, color(intensity, intensity, intensity))
+                    
+                    if vertCount > 3:
+                        self.triangle_bc(x0,x2,x3, y0, y2,y3, z0, z2,z3, vt0x, vt2x,vt3x, vt0y,  vt2y, vt3y , texture = texture,  intensity = intensity)
+                    self.triangle_bc(x0,x1,x2, y0, y1, y2, z0, z1, z2, vt0x ,  vt1x,vt2x,vt0y,vt1y,  vt2y, texture = texture,  intensity = intensity)
 
 
            
