@@ -17,16 +17,18 @@ height=1000
 #creacion de Window
 
 r = Render(width,height)
-#se carga textura
-t = Texture('./models/basketball.bmp')
-#se carga modelo obj con textura, la textura no debe ir obligatoriamente
-#r.loadModel('./models/face.obj', (960,300,0), (15,15,15), t)
-
-#r.loadModel('./models/objBarrel.obj', (500,500,0), (300,300,300), t)
+#se carga textura y modelo obj con la textura
+##para cargar pelota de basketball
+t = Texture('./models/ball.bmp')
 r.loadModel('./models/earth.obj', (500,500,0), (1,1,1), t)
 
+#para cargar ejemplo OBJ de Carlos
+"""t = Texture('./models/model.bmp')
+r.loadModel('./models/model.obj', (500,500,0), (300,300,300), t)"""
+
+
+
 r.glFinish('output.bmp')
-r.glZBuffer('zbuffer.bmp')
 
 
 
