@@ -323,7 +323,7 @@ class Render(object):
                 offset-=2*dx
 
     #Barycentric Coordinates
-    def triangle_bc(self, Ax, Bx, Cx, Ay, By, Cy, Az, Bz, Cz, tax, tbx, tcx, tay, tby, tcy, _color = WHITE, texture = None, intensity = 1 ):
+    def triangle_bc(self, Ax, Bx, Cx, Ay, By, Cy, Az, Bz, Cz, tax, tbx, tcx, tay, tby, tcy, colorest = WHITE, texture = None, intensity = 1 ):
         #bounding box
         minX = min(Ax, Bx, Cx)
         minY = min(Ay, By, Cy)
@@ -342,7 +342,7 @@ class Render(object):
                     
                     if z > self.zbuffer[y][x]:
 
-                        b, g , r = _color
+                        b, g , r = colorest
                         b /= 255
                         g /= 255
                         r /= 255
@@ -350,7 +350,7 @@ class Render(object):
                         b *= intensity
                         g *= intensity
                         r *= intensity
-
+                        #misma operacion de coordenadas bc cuando hay textura en eje x y y
                         if texture:
                             tx = tax * u + tbx * v + tcx * w
                             ty = tay * u + tby * v + tcy * w

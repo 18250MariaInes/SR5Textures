@@ -17,7 +17,9 @@ height=1000
 #creacion de Window
 
 r = Render(width,height)
-t = Texture('./models/woodObj.bmp')
+#se carga textura
+t = Texture('./models/model.bmp')
+#se carga modelo obj con textura, la textura no debe ir obligatoriamente
 #r.loadModel('./models/face.obj', (960,300,0), (15,15,15), t)
 
 #r.loadModel('./models/objBarrel.obj', (500,500,0), (300,300,300), t)

@@ -40,12 +40,13 @@ class Obj(object):
                     self.faces.append([list(map(int,vert.split('/'))) for vert in value.split(' ')])
 
 
-#new code Carlos
+#codigo para cargar textura a model Obj
 class Texture(object):
     def __init__(self, path):
         self.path = path
         self.read()
-        
+    
+    #funcion para leer archivo de textura
     def read(self):
         image = open(self.path, 'rb')
         image.seek(10)
@@ -61,6 +62,7 @@ class Texture(object):
         for y in range(self.height):
             self.pixels.append([])
             for x in range(self.width):
+                #para que no se vuelva verde
                 b = ord(image.read(1)) / 255
                 g = ord(image.read(1)) / 255
                 r = ord(image.read(1)) / 255
@@ -68,6 +70,7 @@ class Texture(object):
 
         image.close()
 
+    #funcion para obtener color 
     def getColor(self, tx, ty):
         if tx >= 0 and tx <= 1 and ty >= 0 and ty <= 1:
             x = int(tx * self.width)
