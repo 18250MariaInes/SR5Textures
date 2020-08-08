@@ -29,15 +29,19 @@ class Obj(object):
         for line in self.lines:
             #print(line.split(' ',1))
             if line: #clasificacion de lineas en txt entre vertices, normales, textcoords y cara de modelo 3D
-                prefix,value=line.split(' ',1)
-                if prefix == 'v': # vertices
-                    self.vertices.append(list(map(float,value.split(' '))))
-                elif prefix == 'vn': #normales
-                    self.normals.append(list(map(float,value.split(' '))))
-                elif prefix == 'vt': #textcoords
-                    self.texcoords.append(list(map(float,value.split(' '))))
-                elif prefix == 'f': #faces XX/YY/ZZ
-                    self.faces.append([list(map(int,vert.split('/'))) for vert in value.split(' ')])
+                try:
+                    prefix, value = line.split(' ', 1)
+                
+                    if prefix == 'v': # vertices
+                        self.vertices.append(list(map(float,value.split(' '))))
+                    elif prefix == 'vn': #normales
+                        self.normals.append(list(map(float,value.split(' '))))
+                    elif prefix == 'vt': #textcoords
+                        self.texcoords.append(list(map(float,value.split(' '))))
+                    elif prefix == 'f': #faces XX/YY/ZZ
+                        self.faces.append([list(map(int,vert.split('/'))) for vert in value.split(' ')])
+                except:
+                    continue
 
 
 #codigo para cargar textura a model Obj
@@ -73,8 +77,8 @@ class Texture(object):
     #funcion para obtener color 
     def getColor(self, tx, ty):
         if tx >= 0 and tx <= 1 and ty >= 0 and ty <= 1:
-            x = int(tx * self.width)
-            y = int(ty * self.height)
+            x = int(tx * self.width-1)
+            y = int(ty * self.height-1)
 
             return self.pixels[y][x]
         else:

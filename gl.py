@@ -24,7 +24,7 @@ def dword(d):
 
 def color(r, g, b):
     #return bytes([b, g, r])
-    return bytes([int(b * 255), int(g * 255), int(r * 255)])
+    return bytes([round(b * 255), round(g * 255), round(r * 255)])
 
 def baryCoords(Ax, Bx, Cx, Ay, By, Cy, Px, Py):
     # u es para la A, v es para B, w para C
