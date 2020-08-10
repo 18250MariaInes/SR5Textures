@@ -322,7 +322,7 @@ class Render(object):
                 #igualmente cuando offset es mayor o igual que el limite 0.5, se le resta 2 veces el diferencial en x
                 offset-=2*dx
 
-    #Barycentric Coordinates
+    #Barycentric Coordinates, pero ahora se le manda la textura para que la muestre en cada triangulo de la textura
     def triangle_bc(self, Ax, Bx, Cx, Ay, By, Cy, Az, Bz, Cz, tax, tbx, tcx, tay, tby, tcy, colorest = WHITE, texture = None, intensity = 1 ):
         #bounding box
         minX = min(Ax, Bx, Cx)
@@ -351,10 +351,11 @@ class Render(object):
                         g *= intensity
                         r *= intensity
                         #misma operacion de coordenadas bc cuando hay textura en eje x y y
+                        #cuando si hay textura, se le carga en cada triangulo
                         if texture:
                             tx = tax * u + tbx * v + tcx * w
                             ty = tay * u + tby * v + tcy * w
-
+                            #mismo carculo que antes para calcular la coord en x y y para obtener su color
                             texColor = texture.getColor(tx, ty)
                             b *= texColor[0] / 255
                             g *= texColor[1] / 255
@@ -404,6 +405,7 @@ class Render(object):
     def dot(self, normal, lightx, lighty, lightz):
         return (normal[0]*lightx+normal[1]*lighty+normal[2]*lightz)
 
+    #ahora acepta textura para cargar en el modelo obj para mandar a la funcion de triangulos
     def loadModel(self, filename, translate, scale, texture=None, isWireframe = False): #funcion para crear modelo Obj
         model = Obj(filename)
         lightx=0
@@ -466,9 +468,8 @@ class Render(object):
                 print(self.division(self.cross(self.subtract(x1, x0, y1, y0, z1, z0), self.subtract(x2, x0, y2, y0, z2, z0)),self.frobenius(self.cross(self.subtract(x1, x0, y1, y0, z1, z0), self.subtract(x2, x0, y2, y0, z2, z0))) ))
                 """
 
-                #----------FORMULA CON FUNCIONES POR MI---------------
-               #normal=productoCruz(V1-V0, v2-V0)/Frobenius
-
+                
+                #ahora que hay textura se obtiene las texcoords del modelo obj para utilizar los vectores 
                 if texture:
                     vt0 = model.texcoords[face[0][1] - 1]
                     vt1 = model.texcoords[face[1][1] - 1]
@@ -483,7 +484,7 @@ class Render(object):
                         vt3 = model.texcoords[face[3][1] - 1]
                         vt3x=vt3[0]
                         vt3y=vt3[1]
-
+                #si no hay textura se mandan como cero
                 else:
                     vt0x=0
                     vt0y=0
@@ -493,7 +494,8 @@ class Render(object):
                     vt2y=0
                     vt3x=0
                     vt3y=0
-
+               #----------FORMULA CON FUNCIONES POR MI---------------
+               #normal=productoCruz(V1-V0, v2-V0)/Frobenius
 
                 normalMI=self.division(self.cross(self.subtract(x1, x0, y1, y0, z1, z0), self.subtract(x2, x0, y2, y0, z2, z0)),self.frobenius(self.cross(self.subtract(x1, x0, y1, y0, z1, z0), self.subtract(x2, x0, y2, y0, z2, z0))) )
                 #ProductoCruz(normal,light)
